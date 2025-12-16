@@ -67,3 +67,8 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+httpRoute:
+  enabled: false
+  hostnames: []
+  parentRefs: []
