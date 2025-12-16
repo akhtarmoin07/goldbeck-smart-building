@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: 'https://github.com/akhtarmoin07/goldbeck-smart-building.git' # <--- UPDATE THIS LATER
     targetRevision: HEAD
-    path: gitops/charts/sensor-dashboard
+    path: gitops/charts/sensor-ingestor
   destination:
     server: https://kubernetes.default.svc
     namespace: default
