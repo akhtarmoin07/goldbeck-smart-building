@@ -1,0 +1,23 @@
+# Default values for sensor-dashboard.
+replicaCount: 1
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  # Overriding the tag demonstrates "Version Control"
+  tag: "1.23.0"
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false # Keep false to save money on Load Balancers
+
+resources: 
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi

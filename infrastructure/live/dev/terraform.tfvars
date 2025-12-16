@@ -1,0 +1,5 @@
+resource_group_name = "goldbeck-smart-building-dev-rg"
+location            = "Germany West Central"
+cluster_name        = "goldbeck-dev-aks"
+dns_prefix          = "goldbeckdev"
+environment         = "Development"

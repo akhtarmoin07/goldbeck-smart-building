@@ -1,0 +1,19 @@
+name: Supply Chain Security Scan
+
+on: [push, pull_request]
+
+jobs:
+  trivy-security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'table'
+          exit-code: '0' # Don't fail the build for the demo, just show results
+          severity: 'CRITICAL,HIGH'
