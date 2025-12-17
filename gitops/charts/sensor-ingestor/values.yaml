@@ -1,6 +1,6 @@
 # gitops/charts/sensor-ingestor/values.yaml
 
-replicaCount: 1
+replicaCount: 3
 
 image:
   repository: akhtarmoin07/sensor-ingestor # CHANGE THIS to your Docker Hub username if different
