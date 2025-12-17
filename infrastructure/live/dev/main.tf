@@ -7,8 +7,8 @@ terraform {
   }
 
   backend "azurerm" {
-      resource_group_name  = "tfstate-rg"
-      storage_account_name = "goldbeckfrankfurt01" 
+      resource_group_name  = "goldbeck-smart-building-tfstate-rg"
+      storage_account_name = "goldbecktfstatev2" 
       container_name       = "tfstate"
       key                  = "dev.terraform.tfstate"
   }
