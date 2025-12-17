@@ -5,7 +5,7 @@ replicaCount: 1
 image:
   repository: akhtarmoin07/sensor-ingestor # CHANGE THIS to your Docker Hub username if different
   pullPolicy: IfNotPresent
-  tag: "v3.1.0"
+  tag: "v3.5.0"
 
 imagePullSecrets: []
 nameOverride: ""
