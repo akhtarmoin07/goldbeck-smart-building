@@ -1,16 +1,24 @@
-# STAGE 1: Build Stage (The Factory)
-# We use a full python image to compile things
-FROM python:3.9-slim as builder
+# FAST & FOOLPROOF DOCKERFILE
+FROM python:3.9-slim
 
 WORKDIR /app
 
-# Copy dependency definition
+# 1. Copy dependencies
 COPY requirements.txt .
 
-# Install dependencies into a local user directory
-# --user installs to /root/.local, which we can copy later
-RUN pip install --user --no-cache-dir -r requirements.txt
+# 2. Install GLOBALLY (fixes the "ModuleNotFoundError")
+RUN pip install --no-cache-dir -r requirements.txt
 
+# 3. Create user
+RUN useradd -m goldbeckuser
+
+# 4. Copy app
+COPY . .
+
+# 5. Switch user & Run
+USER goldbeckuser
+EXPOSE 5000
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
 # STAGE 2: Runtime Stage (The Shipping Box)
 # We use a tiny "Distroless" or slim image for security
 FROM python:3.9-slim
