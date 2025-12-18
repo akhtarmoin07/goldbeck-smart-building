@@ -31,11 +31,13 @@ jobs:
 
       # 3. Scan for Hardcoded Secrets
       # This prevents passwords/keys from leaking into Git
-      - name: Secret and Config Scan
+      - name: Full Security Scan (SCA, IaC & Secrets)
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'config,secret' # Combine them here!
-          scan-ref: '.'
+          scan-type: 'fs'           # Look at the whole filesystem
+          scan-ref: '.'             # Start from the root
           format: 'table'
-          exit-code: '1'
+          exit-code: '1'            # Fail if CRITICAL/HIGH are found
           severity: 'CRITICAL,HIGH'
+          # THIS IS THE KEY: List multiple scanners here
+          scanners: 'vuln,config,secret'
