@@ -1,53 +1,74 @@
-name: Supply Chain Security Scan
+name: Enterprise DevSecOps Pipeline
 
 on: [push, pull_request]
 
 jobs:
-  security-scan:
+  # JOB 1: SECURITY & QUALITY SCANS
+  security-and-quality:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Shallow clones disable SonarCloud analysis
 
-      # 1. Scan for Vulnerabilities in Source Code (SCA)
-      - name: Source Code Scan
+      # 1. SonarCloud Code Quality Scan
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # 2. Trivy IaC & Secret Scan
+      - name: Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
           scan-ref: '.'
-          format: 'table'
-          severity: 'CRITICAL,HIGH'
-
-      # 2. Scan Infrastructure as Code (Terraform & Kubernetes)
-      # This checks for things like "S3 bucket is public" or "Root container"
-      - name: IaC Misconfiguration Scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'config'
-          hide-progress: false
-          format: 'table'
-          exit-code: '1' # Fail the build if Terraform is insecure!
-          severity: 'CRITICAL,HIGH'
-
-      # 3. Scan for Hardcoded Secrets
-      # This prevents passwords/keys from leaking into Git
-      - name: Full Security Scan (SCA, IaC & Secrets)
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'           # Look at the whole filesystem
-          scan-ref: '.'             # Start from the root
-          format: 'table'
-          exit-code: '1'            # Fail if CRITICAL/HIGH are found
-          severity: 'CRITICAL,HIGH'
-          # THIS IS THE KEY: List multiple scanners here
           scanners: 'vuln,config,secret'
+          format: 'table'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
 
-
-        # 4. Snyk Vulnerability Scan (Deep Code Analysis)
+      # 3. Snyk Python Scan
       - name: Snyk Open Source Scan
         uses: snyk/actions/python@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          # ADDED: --file=src/sensor-ingestor/requirements.txt
           args: --severity-threshold=high --skip-unresolved --file=src/sensor-ingestor/requirements.txt
+
+  # JOB 2: BUILD & PUBLISH TO JFROG
+  build-and-publish:
+    needs: security-and-quality # Only run if scans pass!
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 4. Setup JFrog CLI
+      - name: Setup JFrog CLI
+        uses: jfrog/setup-jfrog-cli@v4
+        env:
+          # We add https:// here because the CLI needs it, but the Secret should just be the domain
+          JF_URL: https://${{ secrets.JFROG_URL }} 
+          JF_USER: ${{ secrets.JFROG_USER }}
+          JF_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
+
+      # 5. Build and Push to JFrog Artifactory
+      - name: Build and Push Docker Image
+        run: |
+          # 1. Authenticate Docker
+          # We use the domain WITHOUT https:// for docker login
+          jf docker login
+          
+          # 2. Build the image
+          # NOTICE: I changed 'docker-local' to 'goldbeck-docker' below!
+          docker build -t ${{ secrets.JFROG_URL }}/goldbeck-docker/sensor-ingestor:${{ github.sha }} -f src/sensor-ingestor/Dockerfile src/sensor-ingestor/
+          
+          # 3. Push the image to your new repo
+          jf docker push ${{ secrets.JFROG_URL }}/goldbeck-docker/sensor-ingestor:${{ github.sha }}
+          
+          # 4. Publish Build Info
+          jf rt build-collect-env
+          jf rt build-publish
