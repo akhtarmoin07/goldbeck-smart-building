@@ -3,7 +3,7 @@ name: Enterprise DevSecOps Pipeline
 on: [push, pull_request]
 
 jobs:
-  # JOB 1: SECURITY & QUALITY SCANS
+  # JOB 1: SECURITY & QUALITY SCAN
   security-and-quality:
     runs-on: ubuntu-latest
     steps:
@@ -18,6 +18,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          # This tells SonarCloud who you are without needing a config file
+          args: >
+            -Dsonar.organization=akhtarmoin07
+            -Dsonar.projectKey=akhtarmoin07_goldbeck-smart-building
+            -Dsonar.sources=.
+            -Dsonar.host.url=https://sonarcloud.io
 
       # 2. Trivy IaC & Secret Scan
       - name: Trivy Vulnerability Scanner
