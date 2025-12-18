@@ -49,4 +49,5 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high --skip-unresolved
+          # ADDED: --file=src/sensor-ingestor/requirements.txt
+          args: --severity-threshold=high --skip-unresolved --file=src/sensor-ingestor/requirements.txt
