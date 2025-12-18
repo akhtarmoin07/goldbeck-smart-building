@@ -41,3 +41,12 @@ jobs:
           severity: 'CRITICAL,HIGH'
           # THIS IS THE KEY: List multiple scanners here
           scanners: 'vuln,config,secret'
+
+
+        # 4. Snyk Vulnerability Scan (Deep Code Analysis)
+      - name: Snyk Open Source Scan
+        uses: snyk/actions/python@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --skip-unresolved
