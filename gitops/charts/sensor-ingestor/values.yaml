@@ -38,14 +38,18 @@ service:
   port: 5000 # Make sure this matches your Flask App port (5000 or 8080)
 
 ingress:
-  enabled: false
-  className: ""
-  annotations: {}
+  enabled: true
+  className: "nginx"
+  annotations:
+    # 1. Ask OAuth2-Proxy: "Is this user allowed?"
+    nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.ingress-nginx.svc.cluster.local:4180/oauth2/auth"
+    # 2. If NO, redirect them to the sign-in page
+    nginx.ingress.kubernetes.io/auth-signin: "http://localhost:8080/oauth2/start?rd=$escaped_request_uri"
   hosts:
-    - host: chart-example.local
+    - host: localhost
       paths:
         - path: /
-          pathType: ImplementationSpecific
+          pathType: Prefix
   tls: []
 
 resources: {}
