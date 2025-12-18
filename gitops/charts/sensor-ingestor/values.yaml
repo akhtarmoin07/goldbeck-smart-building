@@ -46,6 +46,17 @@ ingress:
     nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.ingress-nginx.svc.cluster.local:80/oauth2/auth"
     # 2. If NO, redirect them to the sign-in page
     nginx.ingress.kubernetes.io/auth-signin: "http://localhost:8080/oauth2/start?rd=$escaped_request_uri"
+    # --- ADD THESE NEW LINES BELOW ---
+    # 3. Pass the user's email/name to the Python app
+    nginx.ingress.kubernetes.io/auth-response-headers: "X-Auth-Request-User,X-Auth-Request-Email"
+    # 4. Handle cookies correctly for localhost
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      auth_request_set $name_upstream_1 $upstream_cookie__oauth2_proxy;
+      access_by_lua_block {
+        if ngx.var.name_upstream_1 ~= "" then
+          ngx.header["Set-Cookie"] = ngx.var.name_upstream_1 .. "; Max-Age=3600; Path=/; HttpOnly"
+        end
+      }
   hosts:
     - host: localhost
       paths:
