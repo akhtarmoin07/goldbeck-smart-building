@@ -36,6 +36,7 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 5000 # Make sure this matches your Flask App port (5000 or 8080)
+  targetPort: 5000
 
 ingress:
   enabled: true
