@@ -1,19 +1,31 @@
-# This is the "Prefab Component" - The reusable AKS Cluster Blueprint
-
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = var.cluster_name
   location            = var.location
   resource_group_name = var.resource_group_name
   dns_prefix          = var.dns_prefix
 
+  # FIX 1: Restrict API access to your specific IP
+api_server_access_profile {
+  authorized_ip_ranges = ["31.16.255.215/32"]
+}
+
+  # FIX 2: Explicitly enable Role-Based Access Control (RBAC)
+  role_based_access_control_enabled = true
+
   default_node_pool {
     name       = "system"
     node_count = 1
-    vm_size    = "Standard_B2s_v2" # Cheap system node
+    vm_size    = "Standard_B2s_v2"
   }
 
   identity {
     type = "SystemAssigned"
+  }
+
+  # FIX 3: Enable Network Policy (using Azure's native implementation)
+  network_profile {
+    network_plugin = "azure"
+    network_policy = "azure" # This blocks unauthorized Pod-to-Pod traffic
   }
 
   tags = {
