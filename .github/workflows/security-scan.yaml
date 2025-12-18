@@ -3,17 +3,39 @@ name: Supply Chain Security Scan
 on: [push, pull_request]
 
 jobs:
-  trivy-security-scan:
+  security-scan:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Run Trivy vulnerability scanner in repo mode
+      # 1. Scan for Vulnerabilities in Source Code (SCA)
+      - name: Source Code Scan
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
-          ignore-unfixed: true
+          scan-ref: '.'
           format: 'table'
-          exit-code: '0' # Don't fail the build for the demo, just show results
+          severity: 'CRITICAL,HIGH'
+
+      # 2. Scan Infrastructure as Code (Terraform & Kubernetes)
+      # This checks for things like "S3 bucket is public" or "Root container"
+      - name: IaC Misconfiguration Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          hide-progress: false
+          format: 'table'
+          exit-code: '1' # Fail the build if Terraform is insecure!
+          severity: 'CRITICAL,HIGH'
+
+      # 3. Scan for Hardcoded Secrets
+      # This prevents passwords/keys from leaking into Git
+      - name: Secret and Config Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config,secret' # Combine them here!
+          scan-ref: '.'
+          format: 'table'
+          exit-code: '1'
           severity: 'CRITICAL,HIGH'
