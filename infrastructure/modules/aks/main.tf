@@ -4,10 +4,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
   resource_group_name = var.resource_group_name
   dns_prefix          = var.dns_prefix
 
-  # FIX 1: Restrict API access to your specific IP
-api_server_access_profile {
-  authorized_ip_ranges = ["31.16.255.215/32"]
-}
 
   # FIX 2: Explicitly enable Role-Based Access Control (RBAC)
   role_based_access_control_enabled = true
