@@ -63,7 +63,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: src/sensor-ingestor
           file: src/sensor-ingestor/Dockerfile
           push: true
           tags: akhtarmoin07/sensor-ingestor:latest
