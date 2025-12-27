@@ -19,14 +19,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          # This tells SonarCloud who you are without needing a config file
           args: >
             -Dsonar.organization=akhtarmoin07
             -Dsonar.projectKey=akhtarmoin07_goldbeck-smart-building
             -Dsonar.sources=.
             -Dsonar.host.url=https://sonarcloud.io
 
-      # 2. Trivy IaC & Secret Scan
+      # 2. Trivy IaC & Secret Scan (Commented out as per your snippet)
       # - name: Trivy Vulnerability Scanner
       #   uses: aquasecurity/trivy-action@master
       #   with:
@@ -45,34 +44,26 @@ jobs:
         with:
           args: --severity-threshold=high --skip-unresolved --file=src/sensor-ingestor/requirements.txt
 
-  # JOB 2: BUILD & PUBLISH TO JFROG
+  # JOB 2: BUILD & PUBLISH TO DOCKER HUB
   build-and-publish:
-    needs: security-and-quality # Only run if scans pass!
+    needs: security-and-quality
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 4. Setup JFrog CLI
-      - name: Setup JFrog CLI
-        uses: jfrog/setup-jfrog-cli@v4
-        env:
-          # We add https:// here because the CLI needs it, but the Secret should just be the domain
-          JF_URL: https://${{ secrets.JFROG_URL }} 
-          JF_USER: ${{ secrets.JFROG_USER }}
-          JF_PASSWORD: ${{ secrets.JFROG_PASSWORD }}
+      # 1. Login to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 5. Build and Push to JFrog Artifactory
-      - name: Build and Push Docker Image
-        run: |
-          # 1. Authenticate Docker
-          # We use the domain WITHOUT https:// for docker login
-          jf docker login
-          
-          # 2. Build the image
-          docker build -t ${{ secrets.JFROG_URL }}/goldbeck-docker/sensor-ingestor:latest -f src/sensor-ingestor/Dockerfile src/sensor-ingestor/
-          jf docker push ${{ secrets.JFROG_URL }}/goldbeck-docker/sensor-ingestor:latest
-          
-          # 4. Publish Build Info
-          jf rt build-collect-env
-          jf rt build-publish
+      # 2. Build and Push "latest"
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: src/sensor-ingestor/Dockerfile
+          push: true
+          tags: akhtarmoin07/sensor-ingestor:latest
