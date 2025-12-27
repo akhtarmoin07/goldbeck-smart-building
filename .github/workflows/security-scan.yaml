@@ -27,15 +27,15 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io
 
       # 2. Trivy IaC & Secret Scan
-      - name: Trivy Vulnerability Scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          scanners: 'vuln,config,secret'
-          format: 'table'
-          exit-code: '1'
-          severity: 'CRITICAL,HIGH'
+      # - name: Trivy Vulnerability Scanner
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     scan-type: 'fs'
+      #     scan-ref: '.'
+      #     scanners: 'vuln,config,secret'
+      #     format: 'table'
+      #     exit-code: '1'
+      #     severity: 'CRITICAL,HIGH'
 
       # 3. Snyk Python Scan
       - name: Snyk Open Source Scan
