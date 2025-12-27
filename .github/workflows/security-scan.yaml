@@ -12,7 +12,7 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones disable SonarCloud analysis
 
-      # 1. SonarCloud Code Quality Scan
+      # 1. SonarCloud Code Quality Scane
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
