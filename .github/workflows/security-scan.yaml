@@ -70,11 +70,8 @@ jobs:
           jf docker login
           
           # 2. Build the image
-          # NOTICE: I changed 'docker-local' to 'goldbeck-docker' below!
-          docker build -t ${{ secrets.JFROG_URL }}/goldbeck-docker/sensor-ingestor:${{ github.sha }} -f src/sensor-ingestor/Dockerfile src/sensor-ingestor/
-          
-          # 3. Push the image to your new repo
-          jf docker push ${{ secrets.JFROG_URL }}/goldbeck-docker/sensor-ingestor:${{ github.sha }}
+          docker build -t ${{ secrets.JFROG_URL }}/goldbeck-docker/sensor-ingestor:latest -f src/sensor-ingestor/Dockerfile src/sensor-ingestor/
+          jf docker push ${{ secrets.JFROG_URL }}/goldbeck-docker/sensor-ingestor:latest
           
           # 4. Publish Build Info
           jf rt build-collect-env
