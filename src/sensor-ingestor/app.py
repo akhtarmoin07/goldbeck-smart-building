@@ -10,6 +10,14 @@ logger = logging.getLogger("SensorIngestor")
 # We no longer verify passwords/tokens here.
 # We trust the 'OAuth2-Proxy' (Ingress) to do that for us.
 # ---------------------------------------------------------------------------
+@app.route('/')
+def home():
+    # Show a nice welcome message instead of 404
+    return jsonify({
+        "message": "Welcome to the Goldbeck Smart Building Platform",
+        "endpoints": ["/health", "/ingest"],
+        "user_email": request.headers.get('X-Auth-Request-Email', 'Unknown')
+    }), 200
 
 @app.route('/health')
 def health():
