@@ -19,9 +19,8 @@ serviceAccount:
 podAnnotations: {}
 
 service:
-  type: LoadBalancer  # <--- Request a Public IP from Azure
-  port: 80            # Expose on standard Web Port 80
-  targetPort: 5000    # Map it to the Container's Port 5000
+  type: ClusterIP  # <--- Changed back from LoadBalancer
+  port: 5000       # Internal port   # Map it to the Container's Port 5000
 
 ingress:
   enabled: true
