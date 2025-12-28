@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: oauth2-proxy
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://oauth2-proxy.github.io/manifests
+    targetRevision: 6.16.1
+    chart: oauth2-proxy
+    helm:
+      values: |
+        config:
+          # PRODUCTION GRADE: Read from the secret we created manually
+          existingSecret: "oauth2-proxy-creds" 
+        
+        extraArgs:
+          provider: "oidc"
+          # This is not a secret, it is just a URL, so it is safe in Git
+          oidc-issuer-url: "https://login.microsoftonline.com/YOUR_TENANT_ID/v2.0"
+          redirect-url: "http://localhost:8080/oauth2/callback"
+          email-domain: "*"
+          upstream: "file:///dev/null"
+          http-address: "0.0.0.0:4180"
+
+        ingress:
+          enabled: true
+          className: nginx
+          path: /oauth2
+          pathType: Prefix
+          hosts:
+            - localhost
+          annotations:
+            nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
