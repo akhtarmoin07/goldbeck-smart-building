@@ -27,7 +27,7 @@ ingress:
   className: "nginx"
   annotations:
     nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.default.svc.cluster.local:80/oauth2/auth"
-    nginx.ingress.kubernetes.io/auth-signin: "http://localhost:8080/oauth2/start?rd=$escaped_request_uri"
+    nginx.ingress.kubernetes.io/auth-signin: "https://l4.165.91.38.nip.io/oauth2/start?rd=$escaped_request_uri"
     nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
     nginx.ingress.kubernetes.io/proxy-buffers: "4 16k"
     nginx.ingress.kubernetes.io/proxy-busy-buffers-size: "32k"
