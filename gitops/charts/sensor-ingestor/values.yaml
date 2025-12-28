@@ -3,35 +3,20 @@
 replicaCount: 1
 
 image:
-  repository: akhtarmoin07/sensor-ingestor # CHANGE THIS to your Docker Hub username if different
+  repository: akhtarmoin07/sensor-ingestor
   pullPolicy: Always
-  tag: "latest"
+  tag: "latest" # The pipeline will update this!
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
   name: ""
 
 podAnnotations: {}
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 
 service:
   type: NodePort
@@ -41,14 +26,11 @@ ingress:
   enabled: true
   className: "nginx"
   annotations:
-    # 1. Ask OAuth2-Proxy: "Is this user allowed?"
     nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.default.svc.cluster.local:80/oauth2/auth"
-    # 2. If NO, redirect them to the sign-in page
     nginx.ingress.kubernetes.io/auth-signin: "http://localhost:8080/oauth2/start?rd=$escaped_request_uri"
-    # ... existing auth annotations ...
-    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"     # <--- ADD THIS
-    nginx.ingress.kubernetes.io/proxy-buffers: "4 16k"       # <--- ADD THIS
-    nginx.ingress.kubernetes.io/proxy-busy-buffers-size: "32k" # <--- ADD THIS
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+    nginx.ingress.kubernetes.io/proxy-buffers: "4 16k"
+    nginx.ingress.kubernetes.io/proxy-busy-buffers-size: "32k"
   hosts:
     - host: localhost
       paths:
@@ -57,12 +39,6 @@ ingress:
   tls: []
 
 resources: {}
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
 
 autoscaling:
   enabled: false
@@ -81,6 +57,7 @@ httpRoute:
   hostnames: []
   parentRefs: []
 
+# --- SECURITY CONTEXTS (Kept the filled ones) ---
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1000
