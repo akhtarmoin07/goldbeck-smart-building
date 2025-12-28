@@ -18,7 +18,7 @@ spec:
         extraArgs:
           provider: "oidc"
           # This is not a secret, it is just a URL, so it is safe in Git
-          oidc-issuer-url: "https://login.microsoftonline.com/YOUR_TENANT_ID/v2.0"
+          oidc-issuer-url: "https://login.microsoftonline.com/81540043-6291-4469-ab7a-5686f6113819/v2.0"
           redirect-url: "http://localhost:8080/oauth2/callback"
           email-domain: "*"
           upstream: "file:///dev/null"
