@@ -32,10 +32,11 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-buffers: "4 16k"
     nginx.ingress.kubernetes.io/proxy-busy-buffers-size: "32k"
   hosts:
-    - host: localhost
-      paths:
-        - path: /
-          pathType: Prefix
+      # 2. Change host from "localhost" to your Magic Domain
+      - host: "4.165.91.38.nip.io"
+        paths:
+          - path: /
+            pathType: Prefix
   tls: []
 
 resources: {}
