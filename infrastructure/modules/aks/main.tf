@@ -12,6 +12,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     name       = "system"
     node_count = 1
     vm_size    = "Standard_B2s_v2"
+    vnet_subnet_id = azurerm_subnet.aks_subnet.id
   }
 
   identity {
@@ -22,8 +23,14 @@ resource "azurerm_kubernetes_cluster" "aks" {
   network_profile {
     network_plugin = "azure"
     network_policy = "azure" # This blocks unauthorized Pod-to-Pod traffic
+    service_cidr   = "10.0.0.0/16" 
+    dns_service_ip = "10.0.0.10"
   }
 
+# NEW: Connect the WAF (AGIC)
+  ingress_application_gateway {
+    gateway_id = azurerm_application_gateway.network.id
+  }
   tags = {
     Environment = var.environment
   }
@@ -39,4 +46,5 @@ resource "azurerm_kubernetes_cluster_node_pool" "spot" {
   eviction_policy       = "Delete"
   spot_max_price        = -1
   node_taints           = ["kubernetes.azure.com/scalesetpriority=spot:NoSchedule"]
+  vnet_subnet_id  = azurerm_subnet.aks_subnet.id
 }
