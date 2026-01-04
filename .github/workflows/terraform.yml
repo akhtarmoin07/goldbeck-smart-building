@@ -25,7 +25,7 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       
       # Where your Terraform files live (Use "." if they are in the root)
-      WORKING_DIR: ./infrastructure # <--- UPDATE THIS if your .tf files are in a folder!
+      WORKING_DIR: ./infrastructure/live/dev # <--- UPDATE THIS if your .tf files are in a folder!
 
     steps:
       - name: Checkout Code
