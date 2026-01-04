@@ -18,7 +18,7 @@ jobs:
     name: "Terraform"
     runs-on: ubuntu-latest
     env:
-      # Tell Terraform to use the secrets we saved in GitHub
+      # Tell Terraform to use the secrets we saved in GitHub test
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
