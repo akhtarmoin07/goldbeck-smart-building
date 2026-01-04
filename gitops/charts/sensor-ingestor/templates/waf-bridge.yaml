@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: waf-to-nginx-bridge
+  # 👇 Important: This allows the WAF to exist alongside the App Ingress
+  annotations:
+    # 1. This tells the WAF: "This rule is for YOU"
+    kubernetes.io/ingress.class: azure/application-gateway
+    
+    # 2. This creates the "Health Probe" so WAF knows Nginx is alive
+    appgw.ingress.kubernetes.io/health-probe-path: "/"
+    
+    # 3. (Optional) If you want to force HTTP for now
+    appgw.ingress.kubernetes.io/ssl-redirect: "false"
+
+spec:
+  rules:
+  # 👇 The SAME host as your App
+  - host: "sensor.135.116.206.137.nip.io"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            # 👇 CRITICAL: This must match your Nginx Service Name!
+            # Run 'kubectl get svc -n ingress-nginx' to check if this name is correct.
+            # Standard is usually 'ingress-nginx-controller'.
+            name: ingress-nginx-controller
+            port:
+              number: 80
