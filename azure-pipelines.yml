@@ -10,7 +10,7 @@ trigger:
       - infrastructure/** # Only run when Terraform files change
 
 pool:
-  vmImage: 'ANUM'
+  name: Default 
 
 variables:
   # ⚠️ 1. UPDATE THIS with the name of the Service Connection you created in Azure DevOps
