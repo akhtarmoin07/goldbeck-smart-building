@@ -87,10 +87,10 @@ output "connect_command" {
 
 
 
-# This automatically runs "kubectl apply -f application.yaml" for you
-resource "kubectl_manifest" "argocd_app" {
-    yaml_body = file("${path.module}/../../../gitops/clusters/dev/application.yaml")
+# # This automatically runs "kubectl apply -f application.yaml" for you
+# resource "kubectl_manifest" "argocd_app" {
+#     yaml_body = file("${path.module}/../../../gitops/clusters/dev/application.yaml")
 
-    # Critical: Wait for ArgoCD to finish installing first
-    depends_on = [helm_release.argocd]
-}
+#     # Critical: Wait for ArgoCD to finish installing first
+#     depends_on = [helm_release.argocd]
+# }

@@ -9,6 +9,17 @@ spec:
     repoURL: https://kubernetes.github.io/ingress-nginx
     targetRevision: 4.10.0
     chart: ingress-nginx
+  helm:
+        values: |
+          controller:
+            service:
+              annotations:
+                # 1. Switch Health Probes to TCP (Fixes the Timeout Issue)
+                service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: ""
+                service.beta.kubernetes.io/azure-load-balancer-health-probe-protocol: "TCP"
+                
+                # 2. Open the Firewall (Replaces your manual NSG Rule)
+                service.beta.kubernetes.io/azure-allowed-service-tags: "Internet"
   destination:
     server: https://kubernetes.default.svc
     namespace: ingress-nginx
