@@ -25,7 +25,10 @@ resource "azurerm_application_gateway" "network" {
     name                 = "frontend-ip-configuration"
     public_ip_address_id = azurerm_public_ip.waf_public_ip.id
   }
-
+  ssl_policy {
+        policy_type = "Predefined"
+        policy_name = "AppGwSslPolicy20220101" 
+  }
   backend_address_pool {
     name = "backend-pool"
   }
