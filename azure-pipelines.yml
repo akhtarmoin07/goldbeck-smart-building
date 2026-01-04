@@ -14,7 +14,7 @@ pool:
 
 variables:
   # ⚠️ 1. UPDATE THIS with the name of the Service Connection you created in Azure DevOps
-  serviceConnection: 'AzureConnection' 
+  serviceConnection: 'akhtarmoin07' 
   
   # ⚠️ 2. UPDATE THESE with your real Storage Account details
   backendResourceGroup: 'goldbeck-tfstate-rg'
