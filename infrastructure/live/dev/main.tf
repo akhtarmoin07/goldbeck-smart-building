@@ -73,7 +73,7 @@ resource "helm_release" "argocd" {
   create_namespace = true
   version          = "5.51.6"
 
-  # Save money by running low replicas
+  # Save money by running low replica
   set {
     name  = "server.replicas"
     value = "1"
