@@ -1,0 +1,65 @@
+# FILE: azure-pipelines.yml
+# PLACE THIS FILE IN THE ROOT DIRECTORY OF YOUR REPO
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - infrastructure/** # Only run when Terraform files change
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  # ⚠️ 1. UPDATE THIS with the name of the Service Connection you created in Azure DevOps
+  serviceConnection: 'AzureConnection' 
+  
+  # ⚠️ 2. UPDATE THESE with your real Storage Account details
+  backendResourceGroup: 'goldbeck-tfstate-rg'
+  backendStorageAccount: 'goldbecktfstategoldbeck789' # <--- CHECK AZURE PORTAL FOR EXACT NAME
+  backendContainer: 'tfstate'
+  backendKey: 'dev.terraform.tfstate'
+
+  # Path to your Terraform files
+  workingDirectory: 'infrastructure/live/dev'
+
+steps:
+# 1. Install Terraform
+- task: TerraformInstaller@1
+  displayName: 'Install Terraform'
+  inputs:
+    terraformVersion: 'latest'
+
+# 2. Terraform Init
+- task: TerraformTaskV4@4
+  displayName: 'Terraform Init'
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    workingDirectory: '$(workingDirectory)'
+    backendServiceArm: '$(serviceConnection)'
+    backendAzureRmResourceGroupName: '$(backendResourceGroup)'
+    backendAzureRmStorageAccountName: '$(backendStorageAccount)'
+    backendAzureRmContainerName: '$(backendContainer)'
+    backendAzureRmKey: '$(backendKey)'
+
+# 3. Terraform Plan (Runs on every push to check for errors)
+- task: TerraformTaskV4@4
+  displayName: 'Terraform Plan'
+  inputs:
+    provider: 'azurerm'
+    command: 'plan'
+    workingDirectory: '$(workingDirectory)'
+    environmentServiceNameAzureRM: '$(serviceConnection)'
+
+# 4. Terraform Apply (Runs ONLY on 'main' branch)
+- task: TerraformTaskV4@4
+  displayName: 'Terraform Apply'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    workingDirectory: '$(workingDirectory)'
+    environmentServiceNameAzureRM: '$(serviceConnection)'

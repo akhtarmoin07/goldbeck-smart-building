@@ -13,7 +13,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
     node_count = 1
     vm_size    = "Standard_B2s_v2"
     vnet_subnet_id = azurerm_subnet.aks_subnet.id
-    temporary_name_for_rotation = "tempsystem"
   }
 
   identity {
@@ -37,15 +36,15 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 }
 
-# The Spot Node Pool (Cost Savings)
-# resource "azurerm_kubernetes_cluster_node_pool" "spot" {
-#   name                  = "spotpool"
-#   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
-#   vm_size               = "Standard_D2s_v3"
-#   node_count            = 1
-#   priority              = "Spot"
-#   eviction_policy       = "Delete"
-#   spot_max_price        = -1
-#   node_taints           = ["kubernetes.azure.com/scalesetpriority=spot:NoSchedule"]
-#   vnet_subnet_id  = azurerm_subnet.aks_subnet.id
-# }
+
+resource "azurerm_kubernetes_cluster_node_pool" "spot" {
+  name                  = "spotpool"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
+  vm_size               = "Standard_D2s_v3"
+  node_count            = 1
+  priority              = "Spot"
+  eviction_policy       = "Delete"
+  spot_max_price        = -1
+  node_taints           = ["kubernetes.azure.com/scalesetpriority=spot:NoSchedule"]
+  vnet_subnet_id  = azurerm_subnet.aks_subnet.id
+}
