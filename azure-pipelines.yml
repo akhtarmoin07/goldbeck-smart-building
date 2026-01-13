@@ -8,6 +8,7 @@ trigger:
   paths:
     include:
       - infrastructure/** # Only run when Terraform files changes
+      - azure-pipelines.yml
 
 pool:
   name: Default 
@@ -31,6 +32,12 @@ steps:
   displayName: 'Install Terraform'
   inputs:
     terraformVersion: 'latest'
+
+- script: |
+    helm repo add argo https://argoproj.github.io/argo-helm
+    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+    helm repo update
+  displayName: 'Fix Helm Repos'
 
 # 2. Terraform Init
 - task: TerraformTaskV4@4
@@ -63,9 +70,3 @@ steps:
     command: 'apply'
     workingDirectory: '$(workingDirectory)'
     environmentServiceNameAzureRM: '$(serviceConnection)'
-
-- script: |
-    helm repo add argo https://argoproj.github.io/argo-helm
-    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-    helm repo update
-  displayName: 'Fix Helm Repos'
