@@ -16,7 +16,7 @@ metadata:
 spec:
   rules:
   # 👇 The SAME host as your App
-  - host: "sensor.135.116.206.137.nip.io"
+  - host: "sensor.74.241.246.60.nip.io"
     http:
       paths:
       - path: /

@@ -3,7 +3,7 @@
 replicaCount: 1
 
 image:
-  repository: akhtarmoin07/sensor-ingestor
+  repository: goldbeckacrDevelopment.azurecr.io/sensor-ingestor
   pullPolicy: Always
   tag: "latest" # The pipeline will update this!
 
@@ -27,13 +27,13 @@ ingress:
   className: "nginx"
   annotations:
     nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.default.svc.cluster.local:80/oauth2/auth"
-    nginx.ingress.kubernetes.io/auth-signin: "https://sensor.135.116.206.137.nip.io/oauth2/start?rd=$escaped_request_uri"
+    nginx.ingress.kubernetes.io/auth-signin: "https://sensor.74.241.246.60.nip.io/oauth2/start?rd=$escaped_request_uri"
     nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
     nginx.ingress.kubernetes.io/proxy-buffers: "4 16k"
     nginx.ingress.kubernetes.io/proxy-busy-buffers-size: "32k"
   hosts:
       # 2. Change host from "localhost" to your Magic Domain
-      - host: "sensor.135.116.206.137.nip.io"
+      - host: "sensor.74.241.246.60.nip.io"
         paths:
           - path: /
             pathType: Prefix

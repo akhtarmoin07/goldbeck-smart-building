@@ -1,0 +1,103 @@
+name: 🛡️ Enterprise DevSecOps Pipeline
+
+on:
+  push:
+    paths:
+      - 'src/sensor-ingestor/**'              # Run when App code changes
+      - '.github/workflows/devsecops-pipeline.yaml'
+  pull_request:
+    paths:
+      - 'src/sensor-ingestor/**'
+
+permissions:
+  id-token: write             # 🚨 REQUIRED for OIDC Authentication
+  contents: write             # REQUIRED to push GitOps updates back to repo
+  pull-requests: read
+
+jobs:
+  # ==========================================================
+  # JOB 1: SECURITY & QUALITY SCANS (Your Existing Logic)
+  # ==========================================================
+  security-and-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      # 1. SonarCloud Code Quality Scan
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=akhtarmoin07
+            -Dsonar.projectKey=akhtarmoin07_goldbeck-smart-building
+            -Dsonar.sources=src/sensor-ingestor
+            -Dsonar.host.url=https://sonarcloud.io
+
+      # 2. Snyk Security Scan
+      - name: Snyk Open Source Scan
+        uses: snyk/actions/python@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --skip-unresolved --file=src/sensor-ingestor/requirements.txt
+
+  # ==========================================================
+  # JOB 2: BUILD & PUBLISH TO ACR + GITOPS UPDATE (Updated for OIDC)
+  # ==========================================================
+  build-and-publish:
+    needs: security-and-quality
+    runs-on: ubuntu-latest
+    env:
+      ACR_NAME: ${{ secrets.ACR_NAME }}  # Maps your secret 'goldbeckacrDevelopment'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 1. 🔐 NEW: Azure OIDC Login (Replaces Docker Login)
+      # This uses your existing 'AZURE_CLIENT_ID' secrets!
+      - name: 'Azure CLI Login (OIDC)'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # 2. 🐳 NEW: Log in to ACR using the OIDC Identity
+      - name: Log in to ACR
+        run: az acr login --name $ACR_NAME
+
+      # 3. Build and Push (Using the OIDC Session)
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: src/sensor-ingestor
+          file: src/sensor-ingestor/Dockerfile
+          push: true
+          tags: |
+            ${{ env.ACR_NAME }}.azurecr.io/sensor-ingestor:latest
+            ${{ env.ACR_NAME }}.azurecr.io/sensor-ingestor:${{ github.sha }}
+
+      # 4. 🌉 THE BRIDGE: Update GitOps Manifest
+      - name: Update Kubernetes Manifest
+        run: |
+          # Install yq
+          sudo snap install yq
+
+          # Configure Git Identity
+          git config user.name "GitHub Actions Bot"
+          git config user.email "bot@github.com"
+
+          # Update the Image Tag in the Manifest
+          # ⚠️ VERIFY THIS PATH: Ensure this file exists in your repo!
+          yq e '.spec.template.spec.containers[0].image = "${{ env.ACR_NAME }}.azurecr.io/sensor-ingestor:${{ github.sha }}"' -i gitops/apps/sensor-ingestor.yaml
+
+          # Commit and Push
+          git add gitops/apps/sensor-ingestor.yaml
+          git commit -m "Bump sensor-ingestor to version ${{ github.sha }}"
+          git push
