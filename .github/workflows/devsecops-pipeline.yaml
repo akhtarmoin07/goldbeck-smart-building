@@ -11,7 +11,7 @@ on:
 
 permissions:
   id-token: write             # 🚨 REQUIRED for OIDC Authentication
-  contents: write             # REQUIRED to push GitOps updates back to repo
+  contents: write             # REQUIRED to push GitOps updates back to reposs
   pull-requests: read
 
 jobs:
