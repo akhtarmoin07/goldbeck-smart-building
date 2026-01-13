@@ -103,7 +103,7 @@ resource "azurerm_role_assignment" "aks_to_acr" {
 
 # This automatically runs "kubectl apply -f application.yaml" for you
 resource "kubectl_manifest" "argocd_app" {
-    yaml_body = file("${path.module}/../../../gitops/clusters/root-app-dev.yaml")
+    yaml_body = file("${path.module}/../../../gitops/root-app-dev.yaml")
 
     # Critical: Wait for ArgoCD to finish installing first
     depends_on = [helm_release.argocd]
