@@ -7,7 +7,7 @@ trigger:
       - main
   paths:
     include:
-      - infrastructure/** # Only run when Terraform files change
+      - infrastructure/** # Only run when Terraform files changes
 
 pool:
   name: Default 
