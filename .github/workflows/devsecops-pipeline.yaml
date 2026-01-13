@@ -102,7 +102,7 @@ jobs:
           git config user.email "bot@github.com"
           
           # Update the tag
-          yq e '.spec.template.spec.containers[0].image = "${{ env.ACR_NAME }}.azurecr.io/sensor-ingestor:${{ github.sha }}"' -i gitops/apps/sensor-ingestor.yaml
+          yq e '.spec.template.spec.containers[0].image = "${{ env.ACR_NAME }}.azurecr.io/sensor-ingestor:${{ github.sha }}"' -i gitops/charts/sensor-ingestor/values.yaml
           
           # Commit and Push
           git add gitops/apps/sensor-ingestor.yaml
