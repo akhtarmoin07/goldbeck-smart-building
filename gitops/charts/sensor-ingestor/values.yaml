@@ -1,27 +1,21 @@
 # gitops/charts/sensor-ingestor/values.yaml
 
 replicaCount: 1
-
 image:
   repository: goldbeckacrDevelopment.azurecr.io/sensor-ingestor
   pullPolicy: Always
   tag: "latest" # The pipeline will update this!
-
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
-
 serviceAccount:
   create: true
   annotations: {}
   name: ""
-
 podAnnotations: {}
-
 service:
-  type: ClusterIP  # <--- Changed back from LoadBalancer
-  port: 5000       # Internal port   # Map it to the Container's Port 5000
-
+  type: ClusterIP # <--- Changed back from LoadBalancer
+  port: 5000 # Internal port   # Map it to the Container's Port 5000
 ingress:
   enabled: true
   className: "nginx"
@@ -32,37 +26,29 @@ ingress:
     nginx.ingress.kubernetes.io/proxy-buffers: "4 16k"
     nginx.ingress.kubernetes.io/proxy-busy-buffers-size: "32k"
   hosts:
-      # 2. Change host from "localhost" to your Magic Domain
-      - host: "sensor.74.241.246.60.nip.io"
-        paths:
-          - path: /
-            pathType: Prefix
+    # 2. Change host from "localhost" to your Magic Domain
+    - host: "sensor.74.241.246.60.nip.io"
+      paths:
+        - path: /
+          pathType: Prefix
   tls: []
-
 resources: {}
-
 autoscaling:
   enabled: false
   minReplicas: 1
   maxReplicas: 10
   targetCPUUtilizationPercentage: 80
-
 nodeSelector: {}
-
 tolerations: []
-
 affinity: {}
-
 httpRoute:
   enabled: false
   hostnames: []
   parentRefs: []
-
 # --- SECURITY CONTEXTS (Kept the filled ones) ---
 podSecurityContext:
   runAsNonRoot: true
   runAsUser: 1000
-
 securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: false
@@ -70,3 +56,8 @@ securityContext:
   capabilities:
     drop:
       - ALL
+spec:
+  template:
+    spec:
+      containers:
+        - image: goldbeckacrDevelopment.azurecr.io/sensor-ingestor:7f32668d0a1802bb9e3cc3a7cc793f9d6e164d37
