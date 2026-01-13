@@ -10,3 +10,7 @@ output "kube_config" {
   value     = azurerm_kubernetes_cluster.aks.kube_config
   sensitive = true
 }
+output "kubelet_identity" {
+  value       = azurerm_kubernetes_cluster.aks.kubelet_identity
+  description = "The Kubelet Identity used by the AKS cluster"
+}
