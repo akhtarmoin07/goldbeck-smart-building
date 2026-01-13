@@ -12,7 +12,7 @@ logger = logging.getLogger("SensorIngestor")
 # ---------------------------------------------------------------------------
 @app.route('/')
 def home():
-    # Show a nice welcome message instead of 404
+    
     return jsonify({
         "message": "Welcome to the Goldbeck Smart Building Platform",
         "endpoints": ["/health", "/ingest"],

@@ -85,12 +85,26 @@ output "connect_command" {
   value = "az aks get-credentials --resource-group ${var.resource_group_name} --name ${var.cluster_name}"
 }
 
+# Create the Azure Container Registry
+resource "azurerm_container_registry" "acr" {
+  name                = "goldbeckacr${var.environment}" # Must be globally unique
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku                 = "Basic"
+  admin_enabled       = true
+}
 
+# Grant AKS permission to pull from this ACR
+resource "azurerm_role_assignment" "aks_to_acr" {
+  scope                = azurerm_container_registry.acr.id
+  role_definition_name = "AcrPull"
+  principal_id         = module.aks_cluster.kubelet_identity[0].object_id
+}
 
-# # This automatically runs "kubectl apply -f application.yaml" for you
-# resource "kubectl_manifest" "argocd_app" {
-#     yaml_body = file("${path.module}/../../../gitops/clusters/dev/application.yaml")
+# This automatically runs "kubectl apply -f application.yaml" for you
+resource "kubectl_manifest" "argocd_app" {
+    yaml_body = file("${path.module}/../../../gitops/clusters/dev/application.yaml")
 
-#     # Critical: Wait for ArgoCD to finish installing first
-#     depends_on = [helm_release.argocd]
-# }
+    # Critical: Wait for ArgoCD to finish installing first
+    depends_on = [helm_release.argocd]
+}

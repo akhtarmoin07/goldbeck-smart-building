@@ -1,6 +1,13 @@
 name: Enterprise DevSecOps Pipeline
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - 'src/sensor-ingestor/**'           # Only run if App code changes
+      - '.github/workflows/security-scan.yml' # Or if this pipeline file changes
+  pull_request:
+    paths:
+      - 'src/sensor-ingestor/**'
 
 jobs:
   # JOB 1: SECURITY & QUALITY SCAN

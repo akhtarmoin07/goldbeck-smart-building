@@ -17,8 +17,8 @@ variables:
   serviceConnection: 'Azure-Connection' 
   
   # ⚠️ 2. UPDATE THESE with your real Storage Account details
-  backendResourceGroup: 'goldbeck-tfstate-rg'
-  backendStorageAccount: 'goldbecktfstategoldbeck789' # <--- CHECK AZURE PORTAL FOR EXACT NAME
+  backendResourceGroup: 'rg-terraform-state'
+  backendStorageAccount: 'goldbeck789' # <--- CHECK AZURE PORTAL FOR EXACT NAME
   backendContainer: 'tfstate'
   backendKey: 'dev.terraform.tfstate'
 
